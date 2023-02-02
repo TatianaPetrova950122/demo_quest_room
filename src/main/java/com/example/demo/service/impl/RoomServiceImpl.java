@@ -121,7 +121,5 @@ public class RoomServiceImpl implements RoomService {
         return (long)x * y;
 
     }
-
-
 }
 

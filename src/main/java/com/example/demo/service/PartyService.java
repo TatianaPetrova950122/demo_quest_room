@@ -13,6 +13,8 @@ public interface PartyService {
 
     PartyDTO get(String titleNumber);
 
+    PartyDTO set(String titleNumber);
+
     void close(String titleNumber);
 
     Party getParty(String titleNumber);
