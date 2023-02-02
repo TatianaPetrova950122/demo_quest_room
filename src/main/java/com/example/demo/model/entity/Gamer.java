@@ -45,7 +45,7 @@ public class Gamer {
     LocalDateTime updatedAt;
 
     @OneToMany(cascade = CascadeType.ALL)
-    List<Room> rooms;
+    List<Party> parties;
 
     @Enumerated(EnumType.STRING)
     GamerStatus status;

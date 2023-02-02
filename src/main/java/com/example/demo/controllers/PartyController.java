@@ -16,11 +16,6 @@ public class PartyController {
 
     private final PartyService partyService;
 
-    @PostMapping
-    public ResponseEntity<PartyDTO> createParty(@RequestBody PartyDTO partyDTO) {
-        return ResponseEntity.ok(partyService.create(partyDTO));
-    }
-
     @PutMapping
     public ResponseEntity<PartyDTO> openParty(@RequestBody PartyDTO partyDTO) {
         return ResponseEntity.ok(partyService.open(partyDTO));
@@ -31,9 +26,9 @@ public class PartyController {
         return ResponseEntity.ok(partyService.get(titleNumber));
     }
 
-    @GetMapping
-    public ResponseEntity<PartyDTO> setParty(@RequestParam String titleNumber) {
-        return ResponseEntity.ok(partyService.set(titleNumber));
+    @PostMapping("/partyForEverybody")
+    public ResponseEntity<PartyDTO> setGamer(@RequestParam String name, @RequestParam String email) {
+        return ResponseEntity.ok(gamerService.set(name, email));
     }
 
     @DeleteMapping

@@ -1,18 +1,30 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.exeptions.CustomException;
+import com.example.demo.model.dto.GamerDTO;
 import com.example.demo.model.dto.PartyDTO;
+import com.example.demo.model.dto.RoomDTORequest;
+import com.example.demo.model.entity.Gamer;
 import com.example.demo.model.entity.Party;
+import com.example.demo.model.entity.Room;
 import com.example.demo.model.enums.PartyStatus;
 import com.example.demo.model.repository.PartyRepository;
 import com.example.demo.service.PartyService;
+import com.example.demo.utils.PaginationUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.support.PagedListHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -36,12 +48,12 @@ public class PartyServiceImpl implements PartyService {
         return null;
     }
 
-//    @Override
-//    public PartyDTO open(PartyDTO partyDTO) {
-//        Party party = getParty(partyDTO.getTitleNumber());
-//
-//        party.setPartyStatus(party.getPartyStatus() == null ? )
-//    }
+    @Override
+    public PartyDTO open(PartyDTO partyDTO) {
+        Party party = getParty(partyDTO.getTitleNumber());
+
+        party.setPartyStatus(party.getPartyStatus() == null ?)
+    }
 
     @Override
     public PartyDTO get(String titleNumber) {
@@ -57,8 +69,9 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public Party getParty(String titleNumber) {
-        return null;
+    public Party getParty(String partyDTO) {
+        return partyRepository.findByName(partyDTO)
+                .orElseThrow(() -> new CustomException("Группа с таким названием не найдена", HttpStatus.NOT_FOUND));
     }
 
     @Override
@@ -68,11 +81,40 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     public PartyDTO addToGamer(String name, String email) {
-        return null;
+        Gamer gamer = gamerService.getGamer(email);
+        Party party = getParty(name);
+        party.setGamer(gamer);
+        Party save = partyRepository.save(party);
+        PartyDTO response = mapper.convertValue(save, PartyDTO.class);
+        response.setGamerDTO(mapper.convertValue(gamer, GamerDTO.class));
+        return response;
     }
 
     @Override
     public ModelMap getAllParties(Integer page, Integer perPage, String sort, Sort.Direction order) {
-        return null;
+        Pageable pageRequest = PaginationUtil.getPageRequest(page, perPage, sort, order);
+        Page<Party> pageResult = partyRepository.findAll(pageRequest);
+
+        List<PartyDTO> content = pageResult.getContent().stream()
+                .map(h -> mapper.convertValue(h, PartyDTO.class))
+                .collect(Collectors.toList());
+
+        PagedListHolder<PartyDTO> result = new PagedListHolder<>(content);
+
+        result.setPage(page);
+        result.setPageSize(perPage);
+
+        ModelMap map = new ModelMap();
+        map.addAttribute("content", result.getPageList());
+        map.addAttribute("pageNumber", page);
+        map.addAttribute("pageSize", result.getPageSize());
+        map.addAttribute("totalPages", result.getPageCount());
+
+        return map;
+    }
+
+    public Long multiply(int x, int y) {
+
+        return (long) x * y;
     }
 }
